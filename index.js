@@ -1,5 +1,7 @@
 const inquirer = require('inquirer');
 const { Triangle, Square, Circle } = require("./lib/shapes.js"); // Desconstructed syntax
+// Use "require('fs')"" because writeFile is needed to create "logo.svg"?
+const fs = require('fs');
 
 // Depending on what shape we are importing, we will create an object from that class.
 
@@ -28,6 +30,18 @@ const questions = [
     }
 ]
 
+// Based on Module 9 Challenge, 'writeToFile()' function and 'init()' function work together. 
+
+// writeToFile function take its call from inside the 'init()' function:
+function writeToFile(fileName, data) {
+    fs.writeFile(fileName, data, (error) => {
+        if (error) {
+            return console.log(error);
+        }
+        console.log('Generated logo.svg'); // Changed string output for Module 10 Challenge.
+    }); 
+}
+
 async function init() {
     try {
         const userResponses = await inquirer.prompt(questions);
@@ -46,9 +60,13 @@ async function init() {
               shape = new Circle();
               console.log(shape.render()); // Testing to see if circle points are returned.
               break;
-          } // It would be nice to put in something where the user could review their logo choices (shape, text, textColor, shapeColor).
+          } 
         
-        // console.log(userResponses); // Old code (from Module 9 Challenge?).
+        // This writeToFile function invocation creates the logo.svg and puts it in 'examples' folder:
+        writeToFile('./examples/logo.svg', generateLogo(userResponses)); // 'generateLogo' function in separte file.
+
+        // console.log(userResponses); // Test to see what user input ('userResponses').
+        // Is there a way for the user tor review their logo choices (shape, text, textColor, shapeColor) before generating the logo? 
     } catch (error) {
         console.log(error);
     }
