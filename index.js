@@ -1,63 +1,7 @@
 const inquirer = require('inquirer');
 const fs = require('fs');
-// const createShape = require('./lib/createShape');
-// Can be written directly into 'writeFile' function:
-// const fileName = './examples/logo.svg';
-
-const questions = [
-    {
-        name: "text",
-        type: "input",
-        message: "You can have a maximum of three letters on your logo. Enter your letters:"
-    },
-    {
-        name: "textColor",
-        type: "input",
-        message: "What color do you want your letters to be?"
-    },
-    {
-        name: "shapeColor",
-        type: "input",
-        message: "What color do you want your logo shape to be?"
-    },
-    {
-        name: "shape",
-        type: "list",
-        message: "What shape do you want your logo to be?",
-        choices: ["triangle", "square", "circle"]
-    }
-]
-
-class Shape {
-    constructor(text, textColor, shapeColor) {
-        this.text = text;
-        this.textColor = textColor;
-        this.shapeColor = shapeColor; 
-    }
-}
-
-class Triangle extends Shape {
-    constructor(text, textColor, shapeColor) {
-        super(text, textColor, shapeColor);
-    };
-    render() {
-        return `
-        <svg version="1.1" 
-            width="300" height="200"
-            xmlns="http://www.w3.org/2000/svg">
-            <polygon points="100, 15 200, 200 0, 200" fill="${this.shapeColor}"/>
-            <text x="100" y="185" font-size="70" text-anchor="middle" fill="${this.textColor}">${this.text}</text>
-        </svg>
-        `
-    };
-};
-
-function createShape(response) {
-    if (response.shape === 'triangle') {
-        let logoShape = new Triangle (response.text, response.textColor, response.shapeColor);
-        return logoShape.render();
-    }
-}
+const questions = require('./lib/questions');
+const createShape = require('./lib/createShape');
 
 function init() {
     return inquirer.prompt(questions)
@@ -76,6 +20,17 @@ function writeToFile(fileName, data) {
 
 init();
 
+
+// Create a file for the 'if' statements for 'Triangle', 'Square', and 'Circle.'
+// function createShape(response) {
+//     if (response.shape === 'triangle') {
+//         let logoShape = new Triangle (response.text, response.textColor, response.shapeColor);
+//         return logoShape.render();
+//     }
+// }
+
+// Can be written directly into 'writeFile' function:
+// const fileName = './examples/logo.svg';
 
 // 'data' argument needs to be an instance of 'string.'
 
