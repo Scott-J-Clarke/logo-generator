@@ -1,18 +1,10 @@
 const inquirer = require('inquirer');
-// Unsure if this line is needed in 'index.js' since it is being sent to 'createShape.js' for processing:
-const { Triangle, Square, Circle } = require("./lib/shapes.js"); // Desconstructed syntax
-// "require('fs')" needed for writeToFile and create "logo.svg":
 const fs = require('fs');
-// Not sure if 'generateLogo' function is still necessary, so commented it out:
-// const generateLogo = require('./lib/generateLogo.js'); // Brings in 'generateLogo()' function from 'generateLogo.js':
-// Brings in createShape function from '':
-const createShape = require('./lib/createShape.js');
+// const createShape = require('./lib/createShape');
+// Can be written directly into 'writeFile' function:
+// const fileName = './examples/logo.svg';
 
 const questions = [
-    // It seems like "shape" should be the last question because it has the 'render()' function.
-
-    // Commented out first 3 questions to focus on generating the shape points in 'logo.svg':
-
     {
         name: "text",
         type: "input",
@@ -36,30 +28,148 @@ const questions = [
     }
 ]
 
-// generateLogo function is invoked from inside the 'init()' function:
-function generateLogo(response) {
-    // Invokes createShape function (from another file) on user 'response' and creates 'logo.svg' in 'examples' folder.
-    fs.writeFile('./examples/logo.svg', createShape(response), (error) => {
-        if (error) {
-            return console.log(error);
-        }
-        console.log('Generated logo.svg');
-    });
+class Shape {
+    constructor(text, textColor, shapeColor) {
+        this.text = text;
+        this.textColor = textColor;
+        this.shapeColor = shapeColor; 
+    }
 }
 
-// Initalize the application, ask the user questions, then take responses and generate a logo (or throw an error).
+class Triangle extends Shape {
+    constructor(text, textColor, shapeColor) {
+        super(text, textColor, shapeColor);
+    };
+    render() {
+        return `
+        <svg version="1.1" 
+            width="300" height="200"
+            xmlns="http://www.w3.org/2000/svg">
+            <polygon points="100, 15 200, 200 0, 200" fill="${this.shapeColor}"/>
+            <text x="100" y="185" font-size="70" text-anchor="middle" fill="${this.textColor}">${this.text}</text>
+        </svg>
+        `
+    };
+};
+
+function createShape(response) {
+    if (response.shape === 'triangle') {
+        let logoShape = new Triangle (response.text, response.textColor, response.shapeColor);
+        return logoShape.render();
+    }
+}
+
 function init() {
-  inquirer
-    .prompt(questions)
-    .then((response) => {
-      generateLogo(response);
-    }) 
+    return inquirer.prompt(questions)
+    .then(response => {
+        return writeToFile('./examples/logo.svg', createShape(response)); 
+    })    
     .catch(error => {
-      console.log(error);
-    }) 
+            console.log(error);
+    })
+}
+
+function writeToFile(fileName, data) {
+    fs.writeFile(fileName, data, (error) =>
+    error ? console.error(error) : console.log("File created!"));
 }
 
 init();
+
+
+// 'data' argument needs to be an instance of 'string.'
+
+// .then(svgLogoFile => { // 'svgLogoFile' is a 'function.'
+        // 'svgLogoFile' needs to be an instance of 'string.'
+        // When the entire svg string is put in as a parameter, file 'logo.svg' is generated.
+        // So the problem seems to be somewhere between calling 'svgLogoFile' and receiving the string.
+        // '${this.shapeColor}', '${this.textColor}', and '${this.text}' are not being passed either (all 'undefined').
+        // return writeToFile('./examples/logo.svg', svgLogoFile); 
+    // })
+
+// return createShape(response);
+        // console.log(createShape(response));
+
+        // let data = createShape(response);
+        // console.log('Success! Your logo.svg file has been generated!');
+//     }) 
+// }
+
+// fs.writeFile('./examples/logo.svg', createShape(response), (error) => {
+//     if (error) {
+//         return console.log(error);
+//     }
+// })
+
+// const init = () => {
+//     return inquirer.prompt(questions)
+//       .then(response => {
+//         return createShape(response);
+//       })
+//       .then(readmeFile => {
+//         return writeToFile("./dist/README.md", readmeFile);
+//       })
+//       .catch(err => {
+//         console.log(err);
+//       });
+//   };
+
+//   function writeToFile(fileName, data) {
+//     fs.writeFile(fileName, data, (err) =>
+//       err ? console.error(err) : console.log('README created!'));
+//   }
+
+// function writeToFile(fileName, data) {
+//     fs.writeFile(fileName, data, (error) => {
+//         if (error) {
+//             return console.log(error);
+//         }
+//         console.log('Success! Your logo.svg file has been generated!');
+//     }); 
+// }
+
+// Initalize the application, ask the user questions, then take responses and generate a logo (or throw an error).
+
+// Function to initialize README generator app:
+// async function init() {
+//     try {
+//         const userResponses = await inquirer.prompt(questions);
+//         // Inside 'init' function 'writeToFile' needs to take a string as its second argument:
+//         // createShape(userResponses) is not a string. What is it?
+//         writeToFile('./examples/logo.svg', createShape(userResponses));
+//         // try-catch syntax requires a catch or to work properly:
+//     } catch (error) {
+//         console.log(error);
+//     }
+// }
+
+// Invoke the function:
+
+
+// // Does 'response' need to be insde 'generateLogo' function?
+// function generateLogo(response) {
+//     // const svg = createShape(response);
+//     fs.writeFile('./examples/logo.svg', createShape(response), (error) => {
+//         if (error) {
+//             return console.log(error);
+//         }
+//         console.log('Generated logo.svg');
+//     });
+// }
+
+// // Initalize the application, ask the user questions, then take responses and generate a logo (or throw an error).
+// function init() {
+//   inquirer
+//     .prompt(questions)
+//     .then((response) => {
+//       generateLogo(response);
+//     }) 
+//     .catch(error => {
+//       console.log(error);
+//     }) 
+// }
+
+// init();
 
 // Initial code based off of Module 9 Challenge:
 // Trinh suggested 'switch statement' but I can't figure out how to gain access to the 'render()' function through 'generateLogo.js'
